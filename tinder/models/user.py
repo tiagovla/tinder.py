@@ -36,7 +36,7 @@ class User(BaseUser):
 
     def _update(self, data):
         self.distance_mi = data["distance_mi"]
-        self.photos = [Asset(data=photo) for photo in data["photos"]]
+        self.photos = [Asset(self._state, data=photo) for photo in data["photos"]]
 
     async def like(self):
         log.debug(f"Liked user {self}")

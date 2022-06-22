@@ -49,7 +49,7 @@ class Client:
             loop=self.loop,
             **options
         )
-        self.ws = TinderWebSocket(self)# FIXME: throwing exception
+        self.ws = TinderWebSocket(self)  # FIXME: throwing exception
 
     def is_ready(self):
         return self._ready.is_set()
@@ -224,18 +224,5 @@ class Client:
         teasers = []
         for user in data["data"]["results"]:
             for photo_data in user["user"]["photos"]:
-                teasers.append(Asset(data=photo_data))
+                teasers.append(Asset(self._connection, data=photo_data))
         return teasers
-
-
-# def __repr__(self) -> str:
-#         attrs = [
-#             ('id', self.id),
-#             ('name', self.name),
-#             ('position', self.position),
-#             ('nsfw', self.nsfw),
-#             ('news', self.is_news()),
-#             ('category_id', self.category_id),
-#         ]
-#         joined = ' '.join('%s=%r' % t for t in attrs)
-#         return f'<{self.__class__.__name__} {joined}>'
