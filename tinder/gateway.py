@@ -1,6 +1,8 @@
 import aiohttp
 import asyncio
+import logging
 
+log = logging.getLogger(__name__)
 
 class TinderWebSocket:
     def __init__(self, client):
@@ -24,7 +26,7 @@ class TinderWebSocket:
         while True:
             resp = await self.ws.receive()
             resp = resp.data.hex()
-            print(resp)
+            log.debug(f"Gateway message received: {resp}")
 
     async def ping(self):
         while True:
