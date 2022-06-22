@@ -171,6 +171,9 @@ class HTTPClient:
     def like(self, user_id):
         return self.request(Route("POST", "/like/{user_id}", user_id=user_id))
 
+    def skip(self, user_id):
+        return self.request(Route("POST", "/pass/{user_id}", user_id=user_id))
+
     def matches(self):
         return self.request(
             Route("GET", "/v2/matches?locale=en&count=60&message=0&is_tinder_u=false")

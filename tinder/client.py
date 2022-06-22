@@ -204,15 +204,15 @@ class Client:
         data = await self.http.get_user_profile(user_id)
         with open("user.txt", "w") as f:
             f.write(json.dumps(data))
-        return User(data=data["results"])
+        return User(self._connection, data=data["results"])
 
     async def fetch_profile(self):
         data = await self.http.get_profile()
-        return ClientUser(data=data)
+        return ClientUser(self._connection, data=data)
 
     async def fetch_recs(self):
         data = await self.http.get_recs()
-        users = [User(data=user_data) for user_data in data["results"]]
+        users = [User(self._connection, data=user_data) for user_data in data["results"]]
         return users
 
     async def fetch_recs2(self):

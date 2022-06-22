@@ -1,17 +1,19 @@
-from . import abc
+from datetime import datetime
+import logging
 
+from . import abc
+from ..state import ConnectionState
 from .asset import Asset
 
-import json
-
-from datetime import datetime
+log = logging.getLogger(__name__)
 
 
 class BaseUser(abc.User):
-    __slots__ = ("name", "bio", "id", "photos")
+    __slots__ = ("_state", "name", "bio", "id", "photos")
 
-    def __init__(self, *, data):
-        self._update(data)
+    def __init__(self, state: ConnectionState, *, data):
+        self._state: ConnectionState = state
+        BaseUser._update(self, data)
 
     def __str__(self):
         return self.name
@@ -28,13 +30,21 @@ class BaseUser(abc.User):
 class User(BaseUser):
     __slots__ = BaseUser.__slots__ + ("distance_mi",)
 
-    def __init__(self, *, data):
+    def __init__(self, state: ConnectionState, *, data):
+        super().__init__(state, data=data)
         self._update(data)
 
     def _update(self, data):
-        super()._update(data)
         self.distance_mi = data["distance_mi"]
         self.photos = [Asset(data=photo) for photo in data["photos"]]
+
+    async def like(self):
+        log.debug(f"Liked user {self}")
+        await self._state.http.like(self.id)
+
+    async def skip(self):
+        log.debug(f"Skipped user {self}")
+        await self._state.http.skip(self.id)
 
 
 class ClientUser(BaseUser):
@@ -46,7 +56,8 @@ class ClientUser(BaseUser):
         "gender_filter",
     )
 
-    def __init__(self, *, data):
+    def __init__(self, state: ConnectionState, *, data):
+        super().__init__(state, data=data)
         self._update(data)
 
     def _update(self, data):
