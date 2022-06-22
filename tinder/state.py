@@ -1,14 +1,13 @@
-
 import gc
 
 
-class ConnectionState():
+class ConnectionState:
     def __init__(self, *, dispatch, handlers, http, loop, **options):
         self.loop = loop
         self.http = http
         self.dispatch = dispatch
         self.handlers = handlers
-        self.heartbeat_timeout = options.get('heartbeat_timeout', 60.0)
+        self.heartbeat_timeout = options.get("heartbeat_timeout", 60.0)
 
     def clear(self):
         self.client_user = None

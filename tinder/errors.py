@@ -13,9 +13,9 @@ class HTTPException(TinderException):
         self.text = message
 
         if isinstance(message, dict):
-            self.text = message.get('error')
+            self.text = message.get("error")
 
-        fmt = 'Status: {0.status} Error: {1}'
+        fmt = "Status: {0.status} Error: {1}"
         super().__init__(fmt.format(self.response, message))
 
 

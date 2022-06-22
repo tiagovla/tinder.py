@@ -15,7 +15,7 @@ class Snowflake(metaclass=abc.ABCMeta):
     def __subclasshook__(cls, C):
         if cls is Snowflake:
             mro = C.__mro__
-            for attr in ('created_at', 'id'):
+            for attr in ("created_at", "id"):
                 for base in mro:
                     if attr in base.__dict__:
                         break
@@ -42,7 +42,7 @@ class User(metaclass=abc.ABCMeta):
                 return NotImplemented
 
             mro = C.__mro__
-            for attr in ('name', 'bio', 'id'):
+            for attr in ("name", "bio", "id"):
                 for base in mro:
                     if attr in base.__dict__:
                         break

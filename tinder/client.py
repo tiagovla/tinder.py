@@ -21,35 +21,35 @@ class _ClientEventTask(asyncio.Task):
 
     def __repr__(self):
         info = [
-            ('state', self._state.lower()),
-            ('event', self.__event_name),
-            ('coro', repr(self.__original_coro)),
+            ("state", self._state.lower()),
+            ("event", self.__event_name),
+            ("coro", repr(self.__original_coro)),
         ]
         if self._exception is not None:
-            info.append(('exception', repr(self._exception)))
-        return '<ClientEventTask {}>'.format(' '.join('%s=%s' % t for t in info))
+            info.append(("exception", repr(self._exception)))
+        return "<ClientEventTask {}>".format(" ".join("%s=%s" % t for t in info))
 
 
 class Client:
     def __init__(self, *, loop=None, **options):
         self.loop = loop or asyncio.get_event_loop()
-        self.connector = options.pop('connector', None)
-        self.proxy = options.pop('proxy', None)
-        self.proxy_auth = options.pop('proxy_auth', None)
+        self.connector = options.pop("connector", None)
+        self.proxy = options.pop("proxy", None)
+        self.proxy_auth = options.pop("proxy_auth", None)
         self._listeners = {}
         self.http = HTTPClient(
-            self.connector, proxy=self.proxy,
-            proxy_auth=self.proxy_auth, loop=self.loop
+            self.connector, proxy=self.proxy, proxy_auth=self.proxy_auth, loop=self.loop
         )
         self._ready = asyncio.Event()
-        self._handlers = {
-            'ready': self._handle_ready
-        }
+        self._handlers = {"ready": self._handle_ready}
         self._connection = ConnectionState(
-            dispatch=self.dispatch, handlers=self._handlers,
-            http=self.http, loop=self.loop, **options
+            dispatch=self.dispatch,
+            handlers=self._handlers,
+            http=self.http,
+            loop=self.loop,
+            **options
         )
-        self.ws = TinderWebSocket(self)
+        self.ws = TinderWebSocket(self)# FIXME: throwing exception
 
     def is_ready(self):
         return self._ready.is_set()
@@ -71,7 +71,9 @@ class Client:
 
     def _schedule_event(self, coro, event_name, *args, **kwargs):
         wrapped = self._run_event(coro, event_name, *args, **kwargs)
-        return _ClientEventTask(original_coro=coro, event_name=event_name, coro=wrapped, loop=self.loop)
+        return _ClientEventTask(
+            original_coro=coro, event_name=event_name, coro=wrapped, loop=self.loop
+        )
 
     async def wait_until_ready(self):
         await self._ready.wait()
@@ -144,7 +146,7 @@ class Client:
     async def start(self, *args, **kwargs):
         log.debug("Starting client")
 
-        reconnect = kwargs.pop('reconnect', True)
+        reconnect = kwargs.pop("reconnect", True)
 
         await self.login(*args)
         await self.connect(reconnect=reconnect)
@@ -192,17 +194,17 @@ class Client:
 
     def event(self, coro):
         if not asyncio.iscoroutinefunction(coro):
-            raise TypeError('event registered must be a coroutine function')
+            raise TypeError("event registered must be a coroutine function")
 
         setattr(self, coro.__name__, coro)
-        log.debug('%s has successfully been registered as an event', coro.__name__)
+        log.debug("%s has successfully been registered as an event", coro.__name__)
         return coro
 
     async def fetch_user_profile(self, user_id):
         data = await self.http.get_user_profile(user_id)
         with open("user.txt", "w") as f:
             f.write(json.dumps(data))
-        return User(data=data['results'])
+        return User(data=data["results"])
 
     async def fetch_profile(self):
         data = await self.http.get_profile()
@@ -210,7 +212,7 @@ class Client:
 
     async def fetch_recs(self):
         data = await self.http.get_recs()
-        users = [User(data=user_data) for user_data in data['results']]
+        users = [User(data=user_data) for user_data in data["results"]]
         return users
 
     async def fetch_recs2(self):
@@ -220,7 +222,20 @@ class Client:
     async def fetch_teasers(self):
         data = await self.http.get_teasers()
         teasers = []
-        for user in data['data']['results']:
-            for photo_data in user['user']['photos']:
+        for user in data["data"]["results"]:
+            for photo_data in user["user"]["photos"]:
                 teasers.append(Asset(data=photo_data))
         return teasers
+
+
+# def __repr__(self) -> str:
+#         attrs = [
+#             ('id', self.id),
+#             ('name', self.name),
+#             ('position', self.position),
+#             ('nsfw', self.nsfw),
+#             ('news', self.is_news()),
+#             ('category_id', self.category_id),
+#         ]
+#         joined = ' '.join('%s=%r' % t for t in attrs)
+#         return f'<{self.__class__.__name__} {joined}>'
