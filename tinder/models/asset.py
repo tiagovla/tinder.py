@@ -3,7 +3,7 @@ import os
 from typing import Union
 
 from collections import OrderedDict
-from tinder.errors import  TinderException
+from tinder.errors import TinderException
 from tinder.state import ConnectionState
 
 
