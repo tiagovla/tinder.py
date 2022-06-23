@@ -1,7 +1,4 @@
 from tinder import http
-from tinder.errors import HTTPException
-import pytest
-import asyncio
 
 
 def test_route_get_method():

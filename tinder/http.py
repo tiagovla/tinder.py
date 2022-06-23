@@ -4,7 +4,7 @@ from typing import Optional, Union, Any, Dict
 from urllib.parse import quote as _uriquote
 
 import aiohttp
-from .errors import Forbidden, HTTPException, LoginFailure, NotFound
+from .errors import Forbidden, HTTPException, NotFound
 
 log = logging.getLogger(__name__)
 
@@ -222,3 +222,4 @@ class HTTPClient:
     # https://api.gotinder.com/v2/matches/{id}/messages
     # https://api.gotinder.com/user/matches/{id}
     # https://api.gotinder.com/v2/matches
+    # https://api.gotinder.com/like/id/super?locale=en POST
