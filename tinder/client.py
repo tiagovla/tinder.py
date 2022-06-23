@@ -47,7 +47,7 @@ class Client:
             handlers=self._handlers,
             http=self.http,
             loop=self.loop,
-            **options
+            **options,
         )
         self.ws = TinderWebSocket(self)  # FIXME: throwing exception
 
@@ -152,7 +152,7 @@ class Client:
         await self.login(*args)
         await self.connect(reconnect=reconnect)
 
-    async def main(self, *args, **kwargs) -> None:
+    async def main(self) -> None:
         pass
 
     def _handle_ready(self) -> None:
@@ -201,7 +201,7 @@ class Client:
         log.debug("%s has successfully been registered as an event", coro.__name__)
         return coro
 
-    async def fetch_user_profile(self, user_id: Union[str,int]) -> User:
+    async def fetch_user_profile(self, user_id: Union[str, int]) -> User:
         data = await self.http.get_user_profile(user_id)
         log.debug("Fetched user profile.")
         return User(self._connection, data=data["results"])
@@ -220,7 +220,7 @@ class Client:
     async def fetch_recs2(self) -> List[User]:
         data = await self.http.get_recs2()
         log.debug("Fetched records v2.")
-        raise NotImplemented
+        raise NotImplementedError
 
     async def fetch_teasers(self) -> List[Asset]:
         data = await self.http.get_teasers()

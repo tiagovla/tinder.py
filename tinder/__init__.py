@@ -1,19 +1,14 @@
 __title__ = "tinder"
 __author__ = "tiagovla"
-__version__ = "0.1.0"
-__license__ = "MIT"
+__version__ = "0.1.1"
+__license__ = "GPL-3.0-or-later"
 
 import logging
 
 from .client import Client
 
-try:
-    from logging import NullHandler
-except ImportError:
-
-    class NullHandler(logging.Handler):
-        def emit(self, record):
-            pass
-
+from logging import NullHandler
 
 logging.getLogger(__name__).addHandler(NullHandler())
+
+del logging
