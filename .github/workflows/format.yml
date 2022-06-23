@@ -9,6 +9,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: psf/black@stable
         with:
-          options: "--check --verbose -l 100"
+          options: "--check --verbose"
           src: "."
           version: "22.3.0"

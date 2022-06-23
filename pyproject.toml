@@ -11,13 +11,14 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.8"
 aiohttp = "^3.6.2"
-pytest = "^7.1.2"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.3"
 autopep8 = "^1.5.4"
 Sphinx = "^5.0.2"
 sphinx-rtd-theme = "^1.0.0"
+pytest-cov = "^3.0.0"
+pytest = "^7.1.2"
 
 [tool.poetry.extras]
 docs = ["sphinx"]
