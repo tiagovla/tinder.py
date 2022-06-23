@@ -4,6 +4,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
 class TinderWebSocket:
     def __init__(self, client):
         self.client = client
@@ -21,12 +22,14 @@ class TinderWebSocket:
         self.client.loop.create_task(self.ping())
         self.client.loop.create_task(self.receive())
 
-
     async def receive(self):
         while True:
             resp = await self.ws.receive()
-            resp = resp.data.hex()
-            log.debug(f"Gateway message received: {resp}")
+            try:
+                resp = resp.data.hex()
+                log.debug(f"Gateway message received: {resp}")
+            except AttributeError:
+                log.debug(f"Gateway received: {resp}")
 
     async def ping(self):
         while True:
