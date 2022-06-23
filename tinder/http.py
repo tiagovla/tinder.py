@@ -154,30 +154,79 @@ class HTTPClient:
         return await self.__session.ws_connect(url, **kwargs)
 
     def get_profile(self):
+        """Get client profile.
+
+        Returns:
+            Response data.
+        """
         return self.request(Route("GET", "/profile"))
 
     def get_user_profile(self, user_id: Union[str, int]):
+        """Get a user's profile.
+
+        Args:
+            user_id (Union[str, int]): the id of the user.
+
+        Returns:
+            Response data.
+        """
         return self.request(Route("GET", "/user/{user_id}", user_id=user_id))
 
     def get_recs(self):
+        """Get new records.
+
+        Returns:
+            Response data.
+        """
         return self.request(Route("GET", "/user/recs"))
 
     def get_recs2(self):
+        """Get new records (version 2).
+
+        Returns:
+            Response data.
+        """
         params = {"locale": "en"}
         return self.request(Route("GET", "/v2/recs/core"), params=params)
 
     def get_teasers(self):
+        """Get teasers.
+
+        Returns:
+            Response data.
+        """
         return self.request(Route("GET", "/v2/fast-match/teasers"))
 
     def like(self, user_id: Union[str, int]):
+        """Like a user.
+
+        Args:
+            user_id (Union[str, int]): the id of the user.
+
+        Returns:
+            Response data.
+        """
         return self.request(Route("POST", "/like/{user_id}", user_id=user_id))
 
     def skip(self, user_id: Union[str, int]):
+        """Pass a user.
+
+        Args:
+            user_id (Union[str, int]): the id of the user.
+
+        Returns:
+            Response data.
+        """
         return self.request(Route("POST", "/pass/{user_id}", user_id=user_id))
 
     # untested:
 
     def get_teaser(self):
+        """Get teaser.
+
+        Returns:
+            Response data.
+        """
         params = {"locale": "en", "type": "recently-active"}
         return self.request(Route("GET", "/v2/fast-match/teaser"), params=params)
 
@@ -186,34 +235,91 @@ class HTTPClient:
         return self.request(Route("PUT", "/v2/push/notifications"), params=params)
 
     def matches(self, count: int = 60, message: int = 0):
+        """Get matches of the client.
+
+        Args:
+            count (int): number of matches.
+            message (int): message option 0 or 1.
+
+        Returns:
+            Response data.
+        """
         params = {"locale": "en", "count": count, "message": message}
         return self.request(Route("GET", "/v2/matches"), params=params)
 
     def explore(self):
+        """Explore information.
+
+        Returns:
+            Response data.
+        """
         params = {"locale": "en"}
         return self.request(Route("GET", "/v2/explore"), params=params)
 
     def my_likes(self):
+        """Number of likes.
+
+        Returns:
+            Response data.
+        """
         params = {"locale": "en"}
         return self.request(Route("GET", "/v2/my-likes"), params=params)
 
     def unmatch(self, match_id: str):
+        """Unmatch a user.
+
+        Args:
+            match_id (str): the id of the match.
+
+        Returns:
+            Response data.
+        """
         return self.request(Route("DELETE", "/user/matches/{match_id}", match_id=match_id))
 
     def send_message(self, match_id: str, message: str):
+        """Send a message to a user.
+
+        Args:
+            match_id (str): the id of the match.
+            message (str): the message body.
+
+        Returns:
+            Response data.
+        """
         payload = {"message", message}
         return self.request(
             Route("POST", "/user/matches/{match_id}", match_id=match_id), data=payload
         )
 
     def likes_count(self):
+        """Get number of likes.
+
+        Returns:
+            Response data.
+        """
         return self.request(Route("POST", "/v2/fast-match/count"))
 
     def update(self):
+        """Get updates.
+
+        Returns:
+            Response data.
+        """
         params = {"locale": "en"}
         return self.request(Route("GET", "/updates"), params=params)
 
     def meta(self, lat: float, lon: float, force_fetch_resources: bool = True):
+
+        """Get Meta information.
+
+        Args:
+            lat (float): latitude
+            lon (float): longitude
+            force_fetch_resources (bool): flag to force fetch resources.
+
+        Returns:
+            Response data.
+        """
         params = {"locale": "en"}
         payload = {"lat": lat, "lon": lon, "force_fetch_resources": str(force_fetch_resources)}
         return self.request(Route("POST", "/v2/meta"), params=params, data=payload)
