@@ -163,7 +163,8 @@ class HTTPClient:
         return self.request(Route("GET", "/user/recs"))
 
     def get_recs2(self):
-        return self.request(Route("GET", "/v2/recs/core?locale=en-US"))
+        params = {"locale":"en"}
+        return self.request(Route("GET", "/v2/recs/core"), params=params)
 
     def get_teasers(self):
         return self.request(Route("GET", "/v2/fast-match/teasers"))
@@ -171,22 +172,24 @@ class HTTPClient:
     def like(self, user_id: Union[str, int]):
         return self.request(Route("POST", "/like/{user_id}", user_id=user_id))
 
-    def skip(self, user_id: Union[str,int]):
+    def skip(self, user_id: Union[str, int]):
         return self.request(Route("POST", "/pass/{user_id}", user_id=user_id))
 
-    def matches(self):
-        return self.request(
-            Route("GET", "/v2/matches?locale=en&count=60&message=0&is_tinder_u=false")
-        )
+    def matches(self, count: int = 60, message: int = 0):
+        params = {"locale": "en", "count": count, "message": message}
+        return self.request(Route("GET", "/v2/matches"), params=params)
 
     def explore(self):
-        return self.request(Route("GET", "/v2/explore?locale=en"))
+        params = {"locale": "en"}
+        return self.request(Route("GET", "/v2/explore"), params=params)
 
     def update(self):
-        return self.request(Route("GET", "/updates?locale=en"))
+        params = {"locale": "en"}
+        return self.request(Route("GET", "/updates"), params=params)
 
     def my_likes(self):
-        return self.request(Route("GET", "/v2/my-likes?locale=en"))
+        params = {"locale": "en"}
+        return self.request(Route("GET", "/v2/my-likes"), params=params)
 
     # TODO: support endpoints
     # https://api.gotinder.com/v2/matches/{id}/messages
