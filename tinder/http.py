@@ -163,7 +163,7 @@ class HTTPClient:
         return self.request(Route("GET", "/user/recs"))
 
     def get_recs2(self):
-        params = {"locale":"en"}
+        params = {"locale": "en"}
         return self.request(Route("GET", "/v2/recs/core"), params=params)
 
     def get_teasers(self):
@@ -175,6 +175,16 @@ class HTTPClient:
     def skip(self, user_id: Union[str, int]):
         return self.request(Route("POST", "/pass/{user_id}", user_id=user_id))
 
+    # untested:
+
+    def get_teaser(self):
+        params = {"locale": "en", "type": "recently-active"}
+        return self.request(Route("GET", "/v2/fast-match/teaser"), params=params)
+
+    def notification(self):
+        params = {"locale": "en"}
+        return self.request(Route("PUT", "/v2/push/notifications"), params=params)
+
     def matches(self, count: int = 60, message: int = 0):
         params = {"locale": "en", "count": count, "message": message}
         return self.request(Route("GET", "/v2/matches"), params=params)
@@ -183,13 +193,30 @@ class HTTPClient:
         params = {"locale": "en"}
         return self.request(Route("GET", "/v2/explore"), params=params)
 
+    def my_likes(self):
+        params = {"locale": "en"}
+        return self.request(Route("GET", "/v2/my-likes"), params=params)
+
+    def unmatch(self, match_id: str):
+        return self.request(Route("DELETE", "/user/matches/{match_id}", match_id=match_id))
+
+    def send_message(self, match_id: str, message: str):
+        payload = {"message", message}
+        return self.request(
+            Route("POST", "/user/matches/{match_id}", match_id=match_id), data=payload
+        )
+
+    def likes_count(self):
+        return self.request(Route("POST", "/v2/fast-match/count"))
+
     def update(self):
         params = {"locale": "en"}
         return self.request(Route("GET", "/updates"), params=params)
 
-    def my_likes(self):
+    def meta(self, lat: float, lon: float, force_fetch_resources: bool = True):
         params = {"locale": "en"}
-        return self.request(Route("GET", "/v2/my-likes"), params=params)
+        payload = {"lat": lat, "lon": lon, "force_fetch_resources": str(force_fetch_resources)}
+        return self.request(Route("POST", "/v2/meta"), params=params, data=payload)
 
     # TODO: support endpoints
     # https://api.gotinder.com/v2/matches/{id}/messages
