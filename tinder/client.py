@@ -5,6 +5,7 @@ import signal
 import sys
 import traceback
 
+from typing import List, Union
 from .gateway import TinderWebSocket
 from .http import HTTPClient
 from .models import Asset, ClientUser, User
@@ -65,7 +66,7 @@ class Client:
             except asyncio.CancelledError:
                 pass
 
-    async def on_error(self, event_method, *args, **kwargs):
+    async def on_error(self, event_method, *args, **kwargs) -> None:
         print("Ignoring exception in {}".format(event_method), file=sys.stderr)
         traceback.print_exc()
 
@@ -131,19 +132,20 @@ class Client:
         else:
             self._schedule_event(coro, method, *args, **kwargs)
 
-    async def close(self):
+    async def close(self) -> None:
         log.debug("Closing client")
         await self.http.close()
 
-    async def connect(self, *, reconnect=True):
-        coro = self.ws.connect()
-        self.ws = await asyncio.wait_for(coro, timeout=60.0)
+    async def connect(self, *, reconnect=True) -> None:
+        if self.ws:
+            coro = self.ws.connect()
+            self.ws = await asyncio.wait_for(coro, timeout=60.0)
 
-    async def login(self, token):
+    async def login(self, token) -> None:
         log.debug("Logging in")
         await self.http.login(token.strip())
 
-    async def start(self, *args, **kwargs):
+    async def start(self, *args, **kwargs) -> None:
         log.debug("Starting client")
 
         reconnect = kwargs.pop("reconnect", True)
@@ -151,10 +153,10 @@ class Client:
         await self.login(*args)
         await self.connect(reconnect=reconnect)
 
-    async def main(self, *args, **kwargs):
+    async def main(self, *args, **kwargs) -> None:
         pass
 
-    def _handle_ready(self):
+    def _handle_ready(self) -> None:
         log.debug("Ready event!")
         self._ready.set()
 
@@ -200,29 +202,32 @@ class Client:
         log.debug("%s has successfully been registered as an event", coro.__name__)
         return coro
 
-    async def fetch_user_profile(self, user_id):
+    async def fetch_user_profile(self, user_id: Union[str,int]) -> User:
         data = await self.http.get_user_profile(user_id)
-        with open("user.txt", "w") as f:
-            f.write(json.dumps(data))
+        log.debug("Fetched user profile.")
         return User(self._connection, data=data["results"])
 
-    async def fetch_profile(self):
+    async def fetch_profile(self) -> ClientUser:
         data = await self.http.get_profile()
+        log.debug("Fetched client profile.")
         return ClientUser(self._connection, data=data)
 
-    async def fetch_recs(self):
+    async def fetch_recs(self) -> List[User]:
         data = await self.http.get_recs()
         users = [User(self._connection, data=user_data) for user_data in data["results"]]
+        log.debug(f"Fetched {len(users)} user records.")
         return users
 
-    async def fetch_recs2(self):
+    async def fetch_recs2(self) -> List[User]:
         data = await self.http.get_recs2()
-        # todo
+        log.debug("Fetched records v2.")
+        raise NotImplemented
 
-    async def fetch_teasers(self):
+    async def fetch_teasers(self) -> List[Asset]:
         data = await self.http.get_teasers()
         teasers = []
         for user in data["data"]["results"]:
             for photo_data in user["user"]["photos"]:
                 teasers.append(Asset(self._connection, data=photo_data))
+        log.debug(f"Fetched {len(teasers)} teasers.")
         return teasers

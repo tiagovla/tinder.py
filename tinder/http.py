@@ -156,7 +156,7 @@ class HTTPClient:
     def get_profile(self):
         return self.request(Route("GET", "/profile"))
 
-    def get_user_profile(self, user_id):
+    def get_user_profile(self, user_id: Union[str, int]):
         return self.request(Route("GET", "/user/{user_id}", user_id=user_id))
 
     def get_recs(self):
@@ -168,10 +168,10 @@ class HTTPClient:
     def get_teasers(self):
         return self.request(Route("GET", "/v2/fast-match/teasers"))
 
-    def like(self, user_id):
+    def like(self, user_id: Union[str, int]):
         return self.request(Route("POST", "/like/{user_id}", user_id=user_id))
 
-    def skip(self, user_id):
+    def skip(self, user_id: Union[str,int]):
         return self.request(Route("POST", "/pass/{user_id}", user_id=user_id))
 
     def matches(self):
