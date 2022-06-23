@@ -1,7 +1,17 @@
 # tinder.py
 Tinder.py is an asynchronous Python wrapper around the Tinder API. 
 
-## Demo
+## Installation:
+
+```sh
+python -m pip install -U tinder.py
+```
+
+
+## Token:
+Login on a browser and use the "TinderWeb/APIToken".
+
+## Getting Started:
 
 ```python
 import asyncio
