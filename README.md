@@ -1,4 +1,11 @@
-# tinder.py
+![banner](https://user-images.githubusercontent.com/30515389/175213919-b0efccd9-c337-447a-b3f4-7c5ecb1d134e.png)
+
+[![PyPI license](https://img.shields.io/pypi/l/tinder.py.svg)](https://pypi.python.org/pypi/tinder.py/)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/tinder.py.svg)](https://pypi.python.org/pypi/tinder.py/)
+[![PyPI version shields.io](https://img.shields.io/pypi/v/tinder.py.svg)](https://pypi.python.org/pypi/tinder.py/)
+[![DeepSource](https://deepsource.io/gh/tiagovla/tinder.py.svg/?label=active+issues)](https://deepsource.io/gh/tiagovla/tinder.py/?ref=repository-badge)
+[![Documentation Status](https://readthedocs.org/projects/tinder-py/badge/?version=latest)](https://tinder-py.readthedocs.io/en/latest/)
+
 Tinder.py is an asynchronous Python wrapper around the Tinder API. 
 
 ## Installation:
@@ -6,11 +13,6 @@ Tinder.py is an asynchronous Python wrapper around the Tinder API.
 ```sh
 python -m pip install -U tinder.py
 ```
-
-
-## Token:
-Login on a browser and use the "TinderWeb/APIToken".
-
 ## Getting Started:
 
 ```python
@@ -42,5 +44,9 @@ class Client(tinder.Client):
 
 if __name__ == "__main__":
     client = Client()
-    client.run("12345678-1234-1234-1234-123456789abc")
+    client.run("12345678-1234-1234-1234-123456789abc") # api token
 ```
+
+## Token:
+Log in to [tinder](https://tinder.com) on a browser, use the "TinderWeb/APIToken" found in Developer Tools (Ctrl+Shift+I).
+![image](https://user-images.githubusercontent.com/30515389/175216307-d5b1bf08-5080-41c7-a250-ae252b095ab6.png)
