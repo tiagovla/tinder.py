@@ -1,15 +1,15 @@
 import asyncio
 import logging
-from typing import Optional, Union, Any, Dict
+from typing import Optional, Any, Dict, Coroutine
 from urllib.parse import quote as _uriquote
 
 import aiohttp
 from .errors import Forbidden, HTTPException, NotFound
 
-log = logging.getLogger(__name__)
+log: logging.Logger = logging.getLogger(__name__)
 
 
-async def json_or_text(response) -> Union[Dict[str, Any], str]:
+async def json_or_text(response) -> Dict[str, Any] | str:
     try:
         if "application/json" in response.headers["content-type"]:
             return await response.json()
@@ -21,10 +21,10 @@ async def json_or_text(response) -> Union[Dict[str, Any], str]:
 class Route:
     BASE = "https://api.gotinder.com"
 
-    def __init__(self, method, path, **params):
+    def __init__(self, method, path, **params) -> None:
         self.path = path
         self.method = method
-        url = self.BASE + self.path
+        url: str = self.BASE + self.path
         if params:
             self.url = url.format(
                 **{k: _uriquote(v) if isinstance(v, str) else v for k, v in params.items()}
@@ -41,7 +41,7 @@ class HTTPClient:
         proxy: Optional[str] = None,
         proxy_auth: Optional[aiohttp.BasicAuth] = None,
         loop: Optional[asyncio.AbstractEventLoop] = None,
-    ):
+    ) -> None:
         self.loop: asyncio.AbstractEventLoop = loop or asyncio.get_event_loop()
         self.connector: Optional[aiohttp.BaseConnector] = connector
         self.__session: aiohttp.ClientSession
@@ -70,7 +70,7 @@ class HTTPClient:
         if self.__session and self.__session.closed:
             self.__session = aiohttp.ClientSession(connector=self.connector)
 
-    async def get_asset(self, url):
+    async def get_asset(self, url) -> bytes:
         async with self.__session.get(url) as resp:
             if resp.status == 200:
                 return await resp.read()
@@ -81,10 +81,10 @@ class HTTPClient:
             else:
                 raise HTTPException(resp, "failed to get asset")
 
-    async def request(self, route: Route, **kwargs) -> Any:
+    async def request(self, route: Route, **kwargs) -> dict[str, Any] | str:
         method = route.method
         url = route.url
-        headers = kwargs.get("headers")
+        headers: Optional[dict[str, str]] = kwargs.get("headers")
         if headers is None:
             headers = {
                 "app_version": "6.9.4",
@@ -106,7 +106,7 @@ class HTTPClient:
             await self.__global_over.wait()
         for tries in range(3):
             async with self.__session.request(method, url, **kwargs) as r:
-                data = await json_or_text(r)
+                data: dict[str, Any] | str = await json_or_text(r)
                 if 300 > r.status >= 200:
                     return data
                 elif r.status in {500, 502}:
@@ -120,8 +120,8 @@ class HTTPClient:
                     raise HTTPException(r, data)
         raise RuntimeError("Unreachable code in HTTP handling")
 
-    async def fetch_gateway(self):
-        headers = {
+    def fetch_gateway(self) -> Coroutine:
+        headers: dict[str, Optional[str]] = {
             "accept": "application/json",
             "accept-language": "en-US,en;q=0.9,pt;q=0.8",
             "platform": "web",
@@ -132,14 +132,14 @@ class HTTPClient:
             "x-auth-token": self.token,
             "x-supported-image-formats": "jpeg",
         }
-        return await self.request(Route("GET", "/ws/generate?locale=en"), headers=headers)
+        return self.request(Route("GET", "/ws/generate?locale=en"), headers=headers)  # type: ignore
 
     async def get_gateway(self) -> str:
-        token = (await self.fetch_gateway())["token"]
+        token: str = (await self.fetch_gateway())["token"]
         return f"wss://keepalive.gotinder.com/ws?token={token}"
 
     async def ws_connect(self, url: str, *, compress: int = 0) -> aiohttp.ClientWebSocketResponse:
-        kwargs = {
+        kwargs: dict[str, Any] = {
             "proxy_auth": self.proxy_auth,
             "proxy": self.proxy,
             "max_msg_size": 0,
@@ -153,7 +153,7 @@ class HTTPClient:
 
         return await self.__session.ws_connect(url, **kwargs)
 
-    def get_profile(self):
+    def get_profile(self) -> Coroutine:
         """Get client profile.
 
         Returns:
@@ -161,7 +161,7 @@ class HTTPClient:
         """
         return self.request(Route("GET", "/profile"))
 
-    def get_user_profile(self, user_id: Union[str, int]):
+    def get_user_profile(self, user_id: str | int) -> Coroutine:
         """Get a user's profile.
 
         Args:
@@ -172,7 +172,7 @@ class HTTPClient:
         """
         return self.request(Route("GET", "/user/{user_id}", user_id=user_id))
 
-    def get_recs(self):
+    def get_recs(self) -> Coroutine:
         """Get new records.
 
         Returns:
@@ -180,16 +180,16 @@ class HTTPClient:
         """
         return self.request(Route("GET", "/user/recs"))
 
-    def get_recs2(self):
+    def get_recs2(self) -> Coroutine:
         """Get new records (version 2).
 
         Returns:
             Response data.
         """
-        params = {"locale": "en"}
+        params: dict[str, str] = {"locale": "en"}
         return self.request(Route("GET", "/v2/recs/core"), params=params)
 
-    def get_teasers(self):
+    def get_teasers(self) -> Coroutine:
         """Get teasers.
 
         Returns:
@@ -197,7 +197,7 @@ class HTTPClient:
         """
         return self.request(Route("GET", "/v2/fast-match/teasers"))
 
-    def like(self, user_id: Union[str, int]):
+    def like(self, user_id: str | int) -> Coroutine:
         """Like a user.
 
         Args:
@@ -208,7 +208,7 @@ class HTTPClient:
         """
         return self.request(Route("POST", "/like/{user_id}", user_id=user_id))
 
-    def skip(self, user_id: Union[str, int]):
+    def skip(self, user_id: str | int) -> Coroutine:
         """Pass a user.
 
         Args:
@@ -221,20 +221,20 @@ class HTTPClient:
 
     # untested:
 
-    def get_teaser(self):
+    def get_teaser(self) -> Coroutine:
         """Get teaser.
 
         Returns:
             Response data.
         """
-        params = {"locale": "en", "type": "recently-active"}
+        params: dict[str, str] = {"locale": "en", "type": "recently-active"}
         return self.request(Route("GET", "/v2/fast-match/teaser"), params=params)
 
-    def notification(self):
-        params = {"locale": "en"}
+    def notification(self) -> Coroutine:
+        params: dict[str, str] = {"locale": "en"}
         return self.request(Route("PUT", "/v2/push/notifications"), params=params)
 
-    def matches(self, count: int = 60, message: int = 0):
+    def matches(self, count: int = 60, message: int = 0) -> Coroutine:
         """Get matches of the client.
 
         Args:
@@ -244,19 +244,19 @@ class HTTPClient:
         Returns:
             Response data.
         """
-        params = {"locale": "en", "count": count, "message": message}
+        params: dict[str, str | int] = {"locale": "en", "count": count, "message": message}
         return self.request(Route("GET", "/v2/matches"), params=params)
 
-    def explore(self):
+    def explore(self) -> Coroutine:
         """Explore information.
 
         Returns:
             Response data.
         """
-        params = {"locale": "en"}
+        params: dict[str, str] = {"locale": "en"}
         return self.request(Route("GET", "/v2/explore"), params=params)
 
-    def my_likes(self):
+    def my_likes(self) -> Coroutine:
         """Number of likes.
 
         Returns:
@@ -265,7 +265,7 @@ class HTTPClient:
         params = {"locale": "en"}
         return self.request(Route("GET", "/v2/my-likes"), params=params)
 
-    def unmatch(self, match_id: str):
+    def unmatch(self, match_id: str) -> Coroutine:
         """Unmatch a user.
 
         Args:
@@ -276,7 +276,7 @@ class HTTPClient:
         """
         return self.request(Route("DELETE", "/user/matches/{match_id}", match_id=match_id))
 
-    def send_message(self, match_id: str, message: str):
+    def send_message(self, match_id: str, message: str) -> Coroutine:
         """Send a message to a user.
 
         Args:
@@ -291,7 +291,7 @@ class HTTPClient:
             Route("POST", "/user/matches/{match_id}", match_id=match_id), data=payload
         )
 
-    def likes_count(self):
+    def likes_count(self) -> Coroutine:
         """Get number of likes.
 
         Returns:
@@ -299,16 +299,16 @@ class HTTPClient:
         """
         return self.request(Route("POST", "/v2/fast-match/count"))
 
-    def update(self):
+    def update(self) -> Coroutine:
         """Get updates.
 
         Returns:
             Response data.
         """
-        params = {"locale": "en"}
+        params: dict[str, str] = {"locale": "en"}
         return self.request(Route("GET", "/updates"), params=params)
 
-    def meta(self, lat: float, lon: float, force_fetch_resources: bool = True):
+    def meta(self, lat: float, lon: float, force_fetch_resources: bool = True) -> Coroutine:
 
         """Get Meta information.
 
@@ -320,8 +320,12 @@ class HTTPClient:
         Returns:
             Response data.
         """
-        params = {"locale": "en"}
-        payload = {"lat": lat, "lon": lon, "force_fetch_resources": str(force_fetch_resources)}
+        params: dict[str, str] = {"locale": "en"}
+        payload: dict[str, float | str] = {
+            "lat": lat,
+            "lon": lon,
+            "force_fetch_resources": str(force_fetch_resources),
+        }
         return self.request(Route("POST", "/v2/meta"), params=params, data=payload)
 
     # TODO: support endpoints
