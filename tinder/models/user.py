@@ -20,7 +20,7 @@ class BaseUser(abc.User):
 
     def _update(self, data):
         self.name: str = data["name"]
-        self.bio: str = data["bio"]
+        self.bio: str = data.get("bio", "")
         self.id: str = data["_id"]
 
     def __repr__(self):
@@ -63,7 +63,7 @@ class ClientUser(BaseUser):
     def _update(self, data):
         self.name = data["name"]
         self.id = data["_id"]
-        self.bio = data["bio"]
+        self.bio = data.get("bio", "")
         self.birth_date = datetime.strptime(data["birth_date"], "%Y-%m-%dT%H:%M:%S.%fZ")
         self.create_date = datetime.strptime(data["create_date"], "%Y-%m-%dT%H:%M:%S.%fZ")
         self.distance_filter = data["distance_filter"]
