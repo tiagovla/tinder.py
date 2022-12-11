@@ -150,7 +150,7 @@ class Client:
         reconnect = kwargs.pop("reconnect", True)
 
         await self.login(*args)
-        await self.connect(reconnect=reconnect)
+        # await self.connect(reconnect=reconnect)
 
     async def main(self) -> None:
         pass
